@@ -28,7 +28,7 @@ void playerInit(Instance* item){
 	item->items = malloc(2 * sizeof(void));
 	item->items[0] = malloc(sizeof(SDL_FPoint));
 	item->items[1] = malloc(sizeof(float));
-	SDL_FPoint* vel = (void*)item->items[0];
+	SDL_FPoint* vel = &item->items[0];
 
 	vel->x = 0; vel->y = 0;
 }
