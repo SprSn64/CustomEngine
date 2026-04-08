@@ -11,26 +11,29 @@
 
 extern float timer;
 
-Uint32 floatToColour(float r, float g, float b, float a){
-	return (int)(r * 255) + ((int)(g * 255) << 8) + ((int)(b * 255) << 16) + ((int)(a * 255) << 24);
+Uint32 sdlToColour(SDL_FColor colour){
+	return (int)(colour.r * 255) + ((int)(colour.g * 255) << 8) + ((int)(colour.b * 255) << 16) + ((int)(colour.a * 255) << 24);
+}
+
+SDL_FColor colourToSDL(Uint32 colour){
+	return (SDL_FColor){
+		(float)(colour & 0x000000FF) / 255, 
+		(float)((colour & 0x0000FF00) >> 8) / 255,
+		(float)((colour & 0x00FF0000) >> 16) / 255,
+		(float)((colour & 0xFF000000) >> 24) / 255
+	};
 }
 
 Uint32 colourLerp(Uint32 colA, Uint32 colB, float t){
-	float rA = (float)(colA & 0x000000FF) / 255; float rB = (float)(colB & 0x000000FF) / 255;
-	float gA = (float)((colA & 0x0000FF00) >> 8) / 255; float gB = (float)((colB & 0x0000FF00) >> 8) / 255;
-	float bA = (float)((colA & 0x00FF0000) >> 16) / 255; float bB = (float)((colB & 0x00FF0000) >> 16) / 255;
-	float aA = (float)((colA & 0xFF000000) >> 24) / 255; float aB = (float)((colB & 0xFF000000) >> 24) / 255;
+	SDL_FColor newA = colourToSDL(colA); SDL_FColor newB = colourToSDL(colB);
 
-	return floatToColour(lerp(rA, rB, t), lerp(gA, gB, t), lerp(bA, bB, t), lerp(aA, aB, t));
+	return sdlToColour((SDL_FColor){lerp(newA.r, newB.r, t), lerp(newA.g, newB.g, t), lerp(newA.b, newB.b, t), lerp(newA.a, newB.a, t)});
 }
 
 Uint32 colourMult(Uint32 colA, Uint32 colB){
-	float rA = (float)(colA & 0x000000FF) / 255; float rB = (float)(colB & 0x000000FF) / 255;
-	float gA = (float)((colA & 0x0000FF00) >> 8) / 255; float gB = (float)((colB & 0x0000FF00) >> 8) / 255;
-	float bA = (float)((colA & 0x00FF0000) >> 16) / 255; float bB = (float)((colB & 0x00FF0000) >> 16) / 255;
-	float aA = (float)((colA & 0xFF000000) >> 24) / 255; float aB = (float)((colB & 0xFF000000) >> 24) / 255;
+	SDL_FColor newA = colourToSDL(colA); SDL_FColor newB = colourToSDL(colB);
 
-	return floatToColour(rA * rB, gA * gB, bA * bB, aA * aB);
+	return sdlToColour((SDL_FColor){newA.r * newB.r, newA.g * newB.g, newA.b * newB.b, newA.a * newB.a});
 }
 
 void setPixel(Texture* target, Uint16 x, Uint16 y, Uint32 colour){
@@ -147,6 +150,8 @@ Texture* loadTexture(char* path){
 
 void drawTexture(Texture* target, Texture* tex, SDL_Rect* source, SDL_Rect* dest, Uint32 colour){
 	if(!tex || !target) return;
+	if(dest->x + dest->w < 0 || dest->x > target->width) return;
+	if(dest->y + dest->h < 0 || dest->y > target->height) return;
 	for(Uint32 i=0; i<(Uint32)abs(dest->w) * abs(dest->h); i++){
 		Uint32 currPixel = getPixel(tex, 
 			source->x + (i % abs(dest->w)) * ((float)source->w/dest->w) + (source->w - 1) * (dest->w < 0), 

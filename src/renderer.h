@@ -24,7 +24,9 @@ Texture* newTexture(Uint16 width, Uint16 height);
 Texture* loadTexture(char* file);
 Texture* loadRawTexture(char* file);
 
-Uint32 floatToColour(float r, float g, float b, float a);
+Uint32 sdlToColour(SDL_FColor colour);
+SDL_FColor colourToSDL(Uint32 colour);
+
 Uint32 colourLerp(Uint32 colA, Uint32 colB, float t);
 Uint32 colourMult(Uint32 colA, Uint32 colB);
 
