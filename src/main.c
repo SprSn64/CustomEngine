@@ -43,8 +43,11 @@ Texture* fontTex = NULL;
 
 Font baseFont;
 
-Sprite testSprite = {1, (SDL_Point){-16, -32}, NULL, 4, 8};
-Sprite plueySpr = {2, (SDL_Point){-12, -12}, NULL, 1, 1};
+//Sprite testSprite = {1, (SDL_Point){-16, -32}, NULL, 4, 8};
+//Sprite plueySpr = {2, (SDL_Point){-12, -12}, NULL, 1, 1};
+
+Sprite* testSprite = NULL;
+Sprite* plueySpr = NULL;
 
 Tileset testTileset = {NULL, 8, (SDL_Point){16, 16}};
 Tilemap testTilemap = {&testTileset, (SDL_Point){8, 8}, NULL};
@@ -64,17 +67,20 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]){
 
 	renderer = SDL_CreateRenderer(window, NULL); SDL_SetRenderVSync(renderer, 1);
 	renderTex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_XBGR8888, SDL_TEXTUREACCESS_TARGET, screenRes.x, screenRes.y);
-	SDL_SetTextureScaleMode(renderTex, SDL_SCALEMODE_NEAREST);
+	SDL_SetTextureScaleMode(renderTex, SDL_SCALEMODE_PIXELART);
 	SDL_SetRenderVSync(renderer, 1);
 
 	displayTex = newTexture(320, 240);
 
-	plueyTex = loadTexture("assets/pluey.png");
+	//plueyTex = loadTexture("assets/pluey.png");
 	testTex = loadTexture("assets/spamton.png");
 	tilesetTex = loadTexture("assets/tiles.png");
 
-	playerTex = loadTexture("assets/player.png");
+	//playerTex = loadTexture("assets/player.png");
 	fontTex = loadTexture("assets/font.png");
+
+	addSpriteSheet("assets/player.png", 1);
+	addSpriteSheet("assets/pluey.png", 2);
 
 	baseFont = (Font){fontTex, 32, (SDL_Point){8, 8}, (SDL_Point){8, 8}, (SDL_FPoint){7, 0}, 16};
 	fpsText = malloc(12);
@@ -88,19 +94,22 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]){
 	keyList[KEYBIND_UP].code = SDL_SCANCODE_UP; keyList[KEYBIND_DOWN].code = SDL_SCANCODE_DOWN; keyList[KEYBIND_LEFT].code = SDL_SCANCODE_LEFT; keyList[KEYBIND_RIGHT].code = SDL_SCANCODE_RIGHT; 
 	keyList[KEYBIND_A].code = SDL_SCANCODE_X; keyList[KEYBIND_B].code = SDL_SCANCODE_Z; keyList[KEYBIND_START].code = SDL_SCANCODE_RETURN; keyList[KEYBIND_ESC].code = SDL_SCANCODE_ESCAPE; 
 
-	testSprite.frames = malloc(sizeof(Frame) * 4); 
+	/*testSprite.frames = malloc(sizeof(Frame) * 4); 
 	testSprite.frames[0].texture = playerTex; testSprite.frames[0].source = (SDL_Rect){0, 0, 32, 32}; testSprite.frames[0].dest = (SDL_Rect){0, 0, 32, 32};
 	testSprite.frames[1].texture = playerTex; testSprite.frames[1].source = (SDL_Rect){32, 0, 32, 32}; testSprite.frames[1].dest = (SDL_Rect){0, 0, 32, 32};
 	testSprite.frames[2].texture = playerTex; testSprite.frames[2].source = (SDL_Rect){0, 0, 32, 32}; testSprite.frames[2].dest = (SDL_Rect){0, 0, 32, 32};
-	testSprite.frames[3].texture = playerTex; testSprite.frames[3].source = (SDL_Rect){0, 32, 32, 32}; testSprite.frames[3].dest = (SDL_Rect){0, 0, 32, 32};
-	plueySpr.frames = malloc(sizeof(Frame)); 
-	plueySpr.frames[0].texture = plueyTex; plueySpr.frames[0].source = (SDL_Rect){0, 0, 24, 24}; plueySpr.frames[0].dest = (SDL_Rect){0, 0, 24, 24};
+	testSprite.frames[3].texture = playerTex; testSprite.frames[3].source = (SDL_Rect){0, 32, 32, 32}; testSprite.frames[3].dest = (SDL_Rect){0, 0, 32, 32};*/
+	testSprite = loadSpritePack("assets/spritepacks/player.spk");
+
+	//plueySpr.frames = malloc(sizeof(Frame)); 
+	//plueySpr.frames[0].texture = plueyTex; plueySpr.frames[0].source = (SDL_Rect){0, 0, 24, 24}; plueySpr.frames[0].dest = (SDL_Rect){0, 0, 24, 24};
+	plueySpr = loadSpritePack("assets/spritepacks/pluey.spk");
 
 	Instance* solidItem = newInstance(&solidBhv, -1024, 0, NULL, INSTANCE_BASEFLAGS); SDL_FRect* solidScale = &solidItem->items[0];
 	solidScale->x = 2048; solidScale->y = 32;
 
-	newInstance(&playerBhv, 0, 0, &testSprite, INSTANCE_BASEFLAGS);
-	newInstance(&plueyBhv, 200, 120, &plueySpr, INSTANCE_BASEFLAGS);
+	newInstance(&playerBhv, 0, 0, testSprite, INSTANCE_BASEFLAGS);
+	newInstance(&plueyBhv, 200, 120, plueySpr, INSTANCE_BASEFLAGS);
 
 	return SDL_APP_CONTINUE;
 }
